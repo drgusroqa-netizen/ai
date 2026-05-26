@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة أدوات الذكاء الاصطناعي | AI Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Cairo & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            scrollbar-width: thin;
+            scrollbar-color: #333 #050505;
+        }
+        /* Custom Scrollbar for sleek B&W look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222222;
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444444;
+        }
+        /* Focus styles for clean monochrome borders */
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 0 1px #ffffff;
+        }
+        /* Glassmorphism/B&W details */
+        .bw-card {
+            background-color: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bw-card:hover {
+            border-color: #ffffff;
+            background-color: #121212;
+            transform: translateY(-2px);
+        }
+        /* Quick Category Active State */
+        .category-btn.active {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+        /* Hide scrollbar for category tabs on mobile */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="selection:bg-white selection:text-black">
+
+    <div id="app" class="min-h-screen flex flex-col justify-between">
+        
+        <!-- Header -->
+        <header class="border-b border-neutral-900 bg-black/95 backdrop-blur-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 bg-white text-black flex items-center justify-center font-black text-xl rounded-none tracking-tighter">
+                        AI
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-extrabold tracking-tight text-white">بوابة الذكاء الاصطناعي</h1>
+                        <p class="text-[11px] text-neutral-400">الدليل الفخم لجميع الأدوات الذكية المتاحة</p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="flex items-center gap-6 text-sm text-neutral-400">
+                    <div>الأدوات: <span id="tools-count" class="font-mono text-white font-bold">0</span></div>
+                    <div class="h-4 w-[1px] bg-neutral-800"></div>
+                    <div>المفضلة: <span id="favorites-count" class="font-mono text-white font-bold">0</span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            
+            <!-- Hero / Intro Section -->
+            <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+                <span class="inline-block text-[10px] uppercase tracking-widest text-neutral-400 border border-neutral-800 px-3 py-1 mb-4">الدليل الأبيض والأسود الاحترافي</span>
+                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
+                    ابحث عن أي أداة ذكاء اصطناعي بلغة بسيطة
+                </h2>
+                <p class="text-neutral-400 text-sm sm:text-base leading-relaxed">
+                    اكتب ما تريد القيام به وسيقوم المحرك بالبحث الفوري لك. جرب الضغط على: 
+                    <span class="text-white underline cursor-pointer hover:text-neutral-300" onclick="quickSearch('برمجة')">برمجة</span>، 
+                    <span class="text-white underline cursor-pointer hover:text-neutral-300" onclick="quickSearch('صور')">صور</span>، 
+                    <span class="text-white underline cursor-pointer hover:text-neutral-300" onclick="quickSearch('فيديو')">فيديو</span>، 
+                    أو <span class="text-white underline cursor-pointer hover:text-neutral-300" onclick="quickSearch('صوت')">صوت</span>.
+                </p>
+            </div>
+
+            <!-- Search & Filters Area -->
+            <div class="max-w-4xl mx-auto mb-10">
+                <div class="relative flex flex-col md:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <!-- Search Icon -->
+                        <span class="absolute inset-y-0 right-4 flex items-center text-neutral-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </span>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="ماذا تريد أن تصنع؟ (مثال: برمج موقع، تصميم شعار، تلخيص نص، تعديل صوت...)" 
+                            class="w-full bg-neutral-950 border border-neutral-800 text-white placeholder-neutral-600 px-12 py-4 text-base focus:border-white transition-colors duration-200"
+                            oninput="handleSearch()"
+                        >
+                        <!-- Clear Search Button -->
+                        <button id="clear-search" onclick="clearSearchInput()" class="hidden absolute inset-y-0 left-4 flex items-center text-neutral-500 hover:text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Quick View Selector -->
+                    <select 
+                        id="sort-select" 
+                        onchange="handleSearch()"
+                        class="bg-neutral-950 border border-neutral-800 text-white py-4 px-4 text-sm focus:border-white transition-colors duration-200 cursor-pointer min-w-[180px]"
+                    >
+                        <option value="all">جميع الأدوات</option>
+                        <option value="favorites">المفضلة لدي فقط ⭐</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Categories Tabs (Sleek Horizontal Scroll on Mobile) -->
+            <div class="max-w-7xl mx-auto mb-10">
+                <div class="flex items-center justify-between border-b border-neutral-900 pb-4 mb-6">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400">التصنيفات الرئيسية للأجهزة</h3>
+                    <button onclick="selectCategory('الكل')" class="text-xs text-neutral-400 hover:text-white underline">عرض الكل</button>
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar" id="categories-container">
+                    <!-- Dynamic Categories will be injected here -->
+                </div>
+            </div>
+
+            <!-- Active Filters feedback -->
+            <div id="filter-feedback" class="hidden mb-6 flex items-center justify-between bg-neutral-950 border border-neutral-900 p-3 text-xs sm:text-sm text-neutral-400">
+                <div>تم العثور على <span id="filtered-count" class="font-bold text-white">0</span> أداة تناسب معايير البحث</div>
+                <button onclick="resetFilters()" class="text-white underline hover:no-underline font-bold">إعادة تعيين البحث</button>
+            </div>
+
+            <!-- Main Tools Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="tools-grid">
+                <!-- Tools cards will be dynamically injected here -->
+            </div>
+
+            <!-- Empty Search State -->
+            <div id="empty-state" class="hidden text-center py-20 border border-dashed border-neutral-800 my-10">
+                <div class="text-4xl mb-4">🔍</div>
+                <h3 class="text-lg font-bold text-white mb-2">لم نجد أي أداة مطابقة لبحثك</h3>
+                <p class="text-neutral-500 text-sm max-w-md mx-auto mb-6">جرب البحث بكلمات أبسط أو تصفح التصنيفات بالأعلى.</p>
+                <button onclick="resetFilters()" class="bg-white text-black px-4 py-2 text-xs font-bold hover:bg-neutral-200">عرض جميع الأدوات</button>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-neutral-900 bg-black/80 py-8 text-xs sm:text-sm text-neutral-500 mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="font-black text-white text-base">AI Hub</span>
+                    <span>&copy; ٢٠٢٦ بوابة أدوات الذكاء الاصطناعي الشاملة. جميع الحقوق محفوظة لرواد التقنية.</span>
+                </div>
+                <div class="flex gap-6 text-neutral-400">
+                    <a href="#" class="hover:text-white transition-colors">عن البوابة</a>
+                    <a href="#" class="hover:text-white transition-colors">سياسة الخصوصية</a>
+                    <a href="#" class="hover:text-white transition-colors">اتصل بنا</a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="fixed bottom-6 right-6 bg-white text-black px-6 py-3 border border-black shadow-2xl font-bold text-xs sm:text-sm tracking-tight transition-transform duration-300 translate-y-24 z-50">
+            تمت العملية بنجاح!
+        </div>
+
+    </div>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        // Highly expanded database featuring all user requested tools with precise details
+        const DEFAULT_AI_TOOLS = [
+            // ================== أدوات كتابة النصوص والمحادثة ==================
+            {
+                id: "txt1",
+                name: "ChatGPT",
+                url: "https://chatgpt.com",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "روبوت المحادثة الرائد عالمياً لكتابة وتلخيص النصوص، الترجمة، العصف الذهني، البرمجة، والتحليل.",
+                keywords: ["نصوص", "كتابه", "مقال", "محادثة", "شات", "تلخيص", "ترجمة", "افكار", "برمجة", "برمج", "تحليل", "اكواد", "كود"]
+            },
+            {
+                id: "txt2",
+                name: "Claude AI",
+                url: "https://claude.ai",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "مساعد ذكي فائق من Anthropic، ممتاز جداً للكتابة الطويلة والتحليل المتقدم وتصحيح الكود.",
+                keywords: ["نصوص", "كتابه", "محادثة", "شات", "طويل", "تحليل", "دراسة", "برمجة", "كود"]
+            },
+            {
+                id: "txt3",
+                name: "Google Gemini",
+                url: "https://gemini.google.com",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "مساعد متعدد المهام متكامل من Google، مدعوم بأحدث محركات البحث للويب وتحليل البيانات والصور.",
+                keywords: ["نصوص", "محادثة", "شات", "مساعد", "جوجل", "غوغل", "بحث", "صور"]
+            },
+            {
+                id: "txt4",
+                name: "Microsoft Copilot",
+                url: "https://copilot.microsoft.com",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "المساعد الذكي المتكامل مع خدمات مايكروسوفت ونظام ويندوز، يقدم كتابة وبحثاً ذكياً وتوليد صور.",
+                keywords: ["نصوص", "محادثة", "شات", "مايكروسوفت", "ويندوز", "اوفيس", "صور"]
+            },
+            {
+                id: "txt5",
+                name: "Perplexity AI",
+                url: "https://www.perplexity.ai",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "محرك بحث إجابي ذكي يبحث في الويب في الوقت الفعلي ويقدم إجابات موثقة مع ذكر المصادر بدقة.",
+                keywords: ["نصوص", "محادثة", "بحث", "مصادر", "غوغل", "دراسة", "تحليل"]
+            },
+            {
+                id: "txt6",
+                name: "Poe",
+                url: "https://poe.com",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "منصة رائعة تجمع لك عدة نماذج ذكاء اصطناعي مختلفة (مثل Claude و ChatGPT و Llama) في مكان واحد.",
+                keywords: ["نصوص", "محادثة", "شات", "نماذج", "روبوتات", "مساعد"]
+            },
+            {
+                id: "txt7",
+                name: "You.com",
+                url: "https://you.com",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "محرك بحث تفاعلي ومساعد شخصي يركز على الخصوصية والإنتاجية مع تكامل للأدوات البرمجية.",
+                keywords: ["نصوص", "محادثة", "شات", "بحث", "محرك", "ويب"]
+            },
+            {
+                id: "txt8",
+                name: "Notion AI",
+                url: "https://www.notion.so/product/ai",
+                category: "نصوص",
+                pricing: "paid",
+                desc: "مساعد مدمج داخل تطبيق نوستن لكتابة وتلخيص الملاحظات وتنظيم المهام والمستندات بذكاء.",
+                keywords: ["نصوص", "ملاحظات", "تنظيم", "جدولة", "عمل", "مقال", "تلخيص"]
+            },
+            {
+                id: "txt9",
+                name: "Jasper AI",
+                url: "https://www.jasper.ai",
+                category: "نصوص",
+                pricing: "paid",
+                desc: "أداة متقدمة لكتابة المحتوى التسويقي، المقالات الاحترافية، والبريد الإلكتروني للشركات وصناع المحتوى.",
+                keywords: ["نصوص", "تسويق", "اعلان", "مقال", "محتوى", "عمل", "سوشل ميديا"]
+            },
+            {
+                id: "txt10",
+                name: "Copy.ai",
+                url: "https://www.copy.ai",
+                category: "نصوص",
+                pricing: "freemium",
+                desc: "منصة ذكية ممتازة لكتابة الإعلانات السريعة والمنشورات التسويقية ورسائل البريد الترويجية.",
+                keywords: ["نصوص", "تسويق", "كوبيرايتنج", "اعلان", "منشور", "سريع"]
+            },
+
+            // ================== أدوات البرمجة وتوليد الكود ==================
+            {
+                id: "code1",
+                name: "GitHub Copilot",
+                url: "https://github.com/features/copilot",
+                category: "برمجة",
+                pricing: "paid",
+                desc: "مساعد المطورين الأقوى في العالم لإكمال وشرح وكتابة الأكواد داخل بيئات التطوير مباشرة.",
+                keywords: ["برمجة", "برمج", "كود", "اكواد", "تطوير", "فيجوال", "مطور"]
+            },
+            {
+                id: "code2",
+                name: "Cursor",
+                url: "https://www.cursor.com",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "محرر برمجي متكامل مبني على VS Code يدعم الدردشة مع الكود وبناء ملفات برمجية كاملة دفعة واحدة.",
+                keywords: ["برمجة", "برمج", "محرر كود", "اكواد", "تطبيق", "موقع"]
+            },
+            {
+                id: "code3",
+                name: "Replit AI",
+                url: "https://replit.com",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "بيئة تطوير سحابية متكاملة تتيح لك كتابة، تشغيل، ونشر البرمجيات والتطبيقات بالذكاء الاصطناعي.",
+                keywords: ["برمجة", "برمج", "تطوير", "سحابي", "تشغيل كود", "موقع", "استضافة"]
+            },
+            {
+                id: "code4",
+                name: "Codeium",
+                url: "https://codeium.com",
+                category: "برمجة",
+                pricing: "free",
+                desc: "بديل مجاني رائع لـ GitHub Copilot، يقدم إكمالا تلقائياً ذكياً للأكواد ويدعم عشرات المحررات.",
+                keywords: ["برمجة", "برمج", "كود", "اكواد", "مجاني", "مساعد"]
+            },
+            {
+                id: "code5",
+                name: "Tabnine",
+                url: "https://www.tabnine.com",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "أداة عريقة تستخدم الذكاء الاصطناعي للتنبؤ السريع بالأكواد وكتابتها بناء على سياق مشروعك الخاص.",
+                keywords: ["برمجة", "برمج", "كود", "تنبؤ", "تلقائي", "جافا", "بايثون"]
+            },
+            {
+                id: "code6",
+                name: "Bolt.new",
+                url: "https://bolt.new",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "بيئة عمل فورية لبناء وتجربة ونشر تطبيقات الويب الكاملة بمجرد وصف الواجهة أو الوظيفة المطلوبة بالنص.",
+                keywords: ["برمجة", "برمج", "موقع", "تطبيق", "نشر", "ويب", "فرونت اند"]
+            },
+            {
+                id: "code7",
+                name: "Lovable",
+                url: "https://lovable.dev",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "أداة ثورية لإنشاء وتصميم تطبيقات وواجهات مستخدم كاملة وجميلة بالذكاء الاصطناعي في ثوانٍ.",
+                keywords: ["برمجة", "برمج", "تطبيق", "واجهة", "تصميم", "موقع", "لوحة تحكم"]
+            },
+            {
+                id: "code8",
+                name: "v0 by Vercel",
+                url: "https://v0.dev",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "أداة مذهلة من Vercel لتوليد وتصميم واجهات React و Tailwind CSS عبر أوامر نصية بسيطة.",
+                keywords: ["برمجة", "برمج", "تصميم موقع", "تطوير", "واجهة", "رياكت", "فرونت اند"]
+            },
+            {
+                id: "code9",
+                name: "Phind",
+                url: "https://www.phind.com",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "محرك بحث مخصص للمبرمجين، يقوم بحل المشاكل البرمجية وتوفير شروحات دقيقة وأمثلة عملية للأكواد.",
+                keywords: ["برمجة", "برمج", "بحث كود", "مشاكل", "اخطاء", "مطورين"]
+            },
+            {
+                id: "code10",
+                name: "Blackbox AI",
+                url: "https://www.blackbox.ai",
+                category: "برمجة",
+                pricing: "freemium",
+                desc: "أداة سريعة لاستخراج الأكواد البرمجية من الصور ومقاطع الفيديو وشرحها وكتابتها بمجرد الطلب.",
+                keywords: ["برمجة", "برمج", "استخراج", "شرح كود", "كود من صورة", "اكواد"]
+            },
+
+            // ================== أدوات توليد الصور والرسم ==================
+            {
+                id: "img1",
+                name: "Midjourney",
+                url: "https://www.midjourney.com",
+                category: "صور",
+                pricing: "paid",
+                desc: "الأداة الرائدة والأكثر قوة في العالم لتوليد الصور الفنية والرسومات واللوحات فائقة الواقعية.",
+                keywords: ["صور", "صوره", "رسم", "توليد صور", "فن", "فني", "تصميم", "واقعية"]
+            },
+            {
+                id: "img2",
+                name: "DALL·E 3",
+                url: "https://openai.com/index/dall-e-3",
+                category: "صور",
+                pricing: "freemium",
+                desc: "منشئ الصور المطور من OpenAI، مدمج داخل ChatGPT ويتميز بدقة مذهلة في فهم الأوامر والنصوص المعقدة.",
+                keywords: ["صور", "صوره", "رسم", "توليد صور", "شعار", "تلوين", "نص على الصورة"]
+            },
+            {
+                id: "img3",
+                name: "Leonardo AI",
+                url: "https://leonardo.ai",
+                category: "صور",
+                pricing: "freemium",
+                desc: "منصة ممتازة وشاملة لتصميم الشخصيات، أصول الألعاب، والصور الفنية والسينمائية يومياً مجاناً.",
+                keywords: ["صور", "صوره", "رسم", "شخصيات", "انمي", "العاب", "تعديل صور"]
+            },
+            {
+                id: "img4",
+                name: "Adobe Firefly",
+                url: "https://firefly.adobe.com",
+                category: "صور",
+                pricing: "freemium",
+                desc: "الذكاء الاصطناعي التوليدي من Adobe، يتيح تعديل وتوليد الصور وإضافة تأثيرات فنية آمنة تجارياً.",
+                keywords: ["صور", "صوره", "تعديل", "فوتوشوب", "ادوبي", "رسم", "تاثيرات"]
+            },
+            {
+                id: "img5",
+                name: "Canva AI",
+                url: "https://www.canva.com/ai-image-generator",
+                category: "صور",
+                pricing: "freemium",
+                desc: "أدوات التوليد والرسم السحرية من كانفا المدمجة لتسهيل تصميم ودمج الصور الفنية في منشوراتك.",
+                keywords: ["صور", "صوره", "رسم", "تصميم", "توليد", "كانفا"]
+            },
+            {
+                id: "img6",
+                name: "Ideogram",
+                url: "https://ideogram.ai",
+                category: "صور",
+                pricing: "freemium",
+                desc: "أداة مذهلة ومشهورة جداً بتفوقها في كتابة الكلمات والنصوص الإنجليزية داخل الصور المولدة بدون أخطاء.",
+                keywords: ["صور", "صوره", "نصوص في الصورة", "لوحة", "شعار", "رسم", "تصميم"]
+            },
+            {
+                id: "img7",
+                name: "Playground AI",
+                url: "https://playground.com",
+                category: "صور",
+                pricing: "freemium",
+                desc: "منصة تحرير وتوليد صور مرنة تتيح لك دمج الصور، تلوينها، وتعديل مناطق محددة فيها بسهولة.",
+                keywords: ["صور", "صوره", "تعديل صور", "دمج", "رسم", "فوتوشوب"]
+            },
+            {
+                id: "img8",
+                name: "Stable Diffusion Web",
+                url: "https://stablediffusionweb.com",
+                category: "صور",
+                pricing: "free",
+                desc: "الإصدار السحابي المفتوح للمجتمع لتوليد وتحرير الصور بدقة عالية وخيارات تحكم متطورة.",
+                keywords: ["صور", "صوره", "رسم", "توليد صور", "مفتوح المصدر", "مجاني"]
+            },
+            {
+                id: "img9",
+                name: "Craiyon",
+                url: "https://www.craiyon.com",
+                category: "صور",
+                pricing: "free",
+                desc: "أداة لتوليد الصور بشكل سريع وبسيط ومجاني بالكامل دون قيود تذكر.",
+                keywords: ["صور", "صوره", "رسم سريع", "توليد", "مجاني"]
+            },
+            {
+                id: "img10",
+                name: "Pixlr AI",
+                url: "https://pixlr.com/image-generator",
+                category: "صور",
+                pricing: "freemium",
+                desc: "محرر صور شهير مدمج بأدوات ذكاء اصطناعي لتوسيع الخلفيات، توليد العناصر، وتحسين الجودة.",
+                keywords: ["صور", "صوره", "تعديل", "توسيع الصورة", "فلاتر", "تصميم"]
+            },
+
+            // ================== أدوات التصميم والجرافيك ==================
+            {
+                id: "des1",
+                name: "Canva",
+                url: "https://www.canva.com",
+                category: "تصميم",
+                pricing: "freemium",
+                desc: "المنصة الأشهر لتصميم منشورات السوشال ميديا، العروض التقديمية، والفيديوهات بسرعة وسهولة.",
+                keywords: ["تصميم", "سوشل ميديا", "عرض", "بوربوينت", "كانفا", "قوالب", "شعار"]
+            },
+            {
+                id: "des2",
+                name: "Figma AI",
+                url: "https://www.figma.com",
+                category: "تصميم",
+                pricing: "freemium",
+                desc: "أدوات ذكية داخل فيجما لإنشاء النماذج الأولية للمواقع والتطبيقات، وتسهيل تجربة المستخدم UI/UX.",
+                keywords: ["تصميم", "واجهات", "تطبيق", "موقع", "تجربة مستخدم", "فيجما", "رسم"]
+            },
+            {
+                id: "des3",
+                name: "Adobe Express",
+                url: "https://www.adobe.com/express",
+                category: "تصميم",
+                pricing: "freemium",
+                desc: "أداة أدوبي للتصميم السريع للمنشورات والفيديوهات وتعديل المستندات عبر تقنيات الذكاء الاصطناعي.",
+                keywords: ["تصميم", "ادوبي", "سريع", "سوشل ميديا", "قوالب", "تعديل صور"]
+            },
+            {
+                id: "des4",
+                name: "Khroma",
+                url: "http://khroma.co",
+                category: "تصميم",
+                pricing: "free",
+                desc: "أداة مخصصة للمصممين تولد لوحات وتدرجات ألوان ذكية متناسقة بناءً على الألوان التي تفضلها.",
+                keywords: ["تصميم", "الوان", "تنسيق", "لوحة الوان", "تدرج", "مطورين", "مصمم"]
+            },
+            {
+                id: "des5",
+                name: "Uizard",
+                url: "https://uizard.io",
+                category: "تصميم",
+                pricing: "freemium",
+                desc: "أداة سحرية لتحويل الرسومات اليدوية (Wireframes) إلى واجهات تطبيقات ومواقع تفاعلية بلمح البصر.",
+                keywords: ["تصميم", "واجهات", "رسم يدوي", "تطبيق", "موقع", "نموذج"]
+            },
+            {
+                id: "des6",
+                name: "Looka",
+                url: "https://looka.com",
+                category: "تصميم",
+                pricing: "freemium",
+                desc: "مساعد ذكي لتصميم الهويات البصرية والشعارات والبروشورات للشركات والمشاريع الناشئة.",
+                keywords: ["تصميم", "شعار", "لوغو", "لوجو", "هوية بصرية", "براند", "شركة"]
+            },
+            {
+                id: "des7",
+                name: "Framer AI",
+                url: "https://www.framer.com",
+                category: "تصميم",
+                pricing: "freemium",
+                desc: "صمم صفحات ويب ومواقع تفاعلية بالكامل بمجرد كتابة فكرتك بالنص، ونشرها على نطاق مخصص.",
+                keywords: ["تصميم", "موقع", "صفحة ويب", "فرامر", "نشر", "تفاعل"]
+            },
+
+            // ================== أدوات صناعة وتحرير الفيديو ==================
+            {
+                id: "vid1",
+                name: "Runway ML (Gen-3)",
+                url: "https://runwayml.com",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "الأداة الرائدة لتوليد لقطات سينمائية ومقاطع فيديو عالية الجودة من الصور والنصوص بدقة مذهلة.",
+                keywords: ["فيديو", "فديو", "صناعة فيديو", "سينمائي", "تحريك صور", "مونتاج"]
+            },
+            {
+                id: "vid2",
+                name: "Pika Labs",
+                url: "https://pika.art",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "منصة لتحويل الكلمات والصور إلى فيديوهات حركية وكرتونية جذابة مع إمكانية تحرير عناصر محددة.",
+                keywords: ["فيديو", "فديو", "تحريك", "كرتون", "انمي", "انيميشن"]
+            },
+            {
+                id: "vid3",
+                name: "Synthesia",
+                url: "https://www.synthesia.io",
+                category: "فيديو",
+                pricing: "paid",
+                desc: "إنشاء مقاطع فيديو وشروحات احترافية باستخدام شخصيات افتراضية (أفاتار) ناطقة بمئات اللغات.",
+                keywords: ["فيديو", "فديو", "متحدث افتراضي", "شخصيات", "تعليم", "عرض"]
+            },
+            {
+                id: "vid4",
+                name: "HeyGen",
+                url: "https://www.heygen.com",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "أقوى أداة لتوليد متحدث افتراضي واقعي يتحدث بصوتك المترجم وبأكثر من لغة بدقة حركة شفاه فائقة.",
+                keywords: ["فيديو", "فديو", "افاتار", "مذيع", "ترجمة صوتية", "تسويق"]
+            },
+            {
+                id: "vid5",
+                name: "CapCut AI",
+                url: "https://www.capcut.com",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "محرر الفيديو الشهير مدعوم بفلترة ذكية ومقاطع سحرية وصوتية وإزالة الخلفية تلقائياً.",
+                keywords: ["فيديو", "فديو", "مونتاج", "كاب كت", "تعديل فيديو", "تيك توك"]
+            },
+            {
+                id: "vid6",
+                name: "Descript",
+                url: "https://www.descript.com",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "أداة فريدة تتيح لك تحرير وتعديل الفيديو والبودكاست من خلال تعديل النص المكتوب مباشرة.",
+                keywords: ["فيديو", "فديو", "تفريغ صوتي", "تعديل", "بودكاست", "نصوص"]
+            },
+            {
+                id: "vid7",
+                name: "InVideo AI",
+                url: "https://invideo.io",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "توليد مقاطع فيديو كاملة لليوتيوب أو السوشل ميديا مع تعليق صوتي مناسب بمجرد إعطائه الفكرة.",
+                keywords: ["فيديو", "فديو", "صناعة فيديو", "تعليق صوتي", "يوتيوب", "تلقائي"]
+            },
+            {
+                id: "vid8",
+                name: "VEED.IO",
+                url: "https://www.veed.io",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "محرر فيديو سحابي لقص الفيديوهات، إضافة ترجمات نصية تلقائية، وتعديل المؤثرات الصوتية.",
+                keywords: ["فيديو", "فديو", "تعديل", "ترجمة تلقائية", "سحابي", "ترجمة"]
+            },
+            {
+                id: "vid9",
+                name: "Luma AI",
+                url: "https://lumalabs.ai",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "توليد فيديوهات، كاميرا حرة، ونمذجة ثلاثية الأبعاد واقعية للمشاهد والأشياء من خلال هاتفك.",
+                keywords: ["فيديو", "فديو", "ثلاثي الابعاد", "تحريك", "مجسمات", "واقعي"]
+            },
+            {
+                id: "vid10",
+                name: "Kling AI",
+                url: "https://klingai.com",
+                category: "فيديو",
+                pricing: "freemium",
+                desc: "أداة توليد فيديو واقعية وحركية مذهلة تتبع قوانين الفيزياء لإنتاج لقطات تحبس الأنفاس.",
+                keywords: ["فيديو", "فديو", "واقعي", "حركة فيزيائية", "سينما"]
+            },
+
+            // ================== أدوات البحث والتحليل ==================
+            {
+                id: "res1",
+                name: "Elicit",
+                url: "https://elicit.com",
+                category: "بحث",
+                pricing: "freemium",
+                desc: "أداة بحثية متقدمة تقوم بتحليل الأوراق الأكاديمية واستخراج النتائج وتلخيص الأبحاث.",
+                keywords: ["بحث", "تحليل", "دراسة", "علمي", "جامعة", "أوراق علمية", "تلخيص"]
+            },
+            {
+                id: "res2",
+                name: "Consensus",
+                url: "https://consensus.app",
+                category: "بحث",
+                pricing: "freemium",
+                desc: "محرك بحث مخصص للإجابة على الأسئلة بالاعتماد المباشر على إجماع الدراسات والأبحاث العلمية الموثقة.",
+                keywords: ["بحث", "علمي", "دراسة", "جامعة", "مصادر موثوقة", "تعليم"]
+            },
+            {
+                id: "res3",
+                name: "Scite",
+                url: "https://scite.ai",
+                category: "بحث",
+                pricing: "paid",
+                desc: "منصة ذكية تتيح للباحثين تقييم صحة الاقتباسات العلمية ومدى تأييد الدراسات الأخرى لها.",
+                keywords: ["بحث", "اقتباسات", "علمي", "تحليل", "جامعة", "توثيق"]
+            },
+            {
+                id: "res4",
+                name: "Semantic Scholar",
+                url: "https://www.semanticscholar.org",
+                category: "بحث",
+                pricing: "free",
+                desc: "محرك بحث أكاديمي مجاني يعتمد على الذكاء الاصطناعي لفهم الروابط بين الأبحاث وتسهيل الوصول لها.",
+                keywords: ["بحث", "علمي", "مجاني", "أكاديمي", "مصادر", "جامعة"]
+            },
+            {
+                id: "res5",
+                name: "Wolfram Alpha",
+                url: "https://www.wolframalpha.com",
+                category: "بحث",
+                pricing: "freemium",
+                desc: "محرك حسابي ومعرفي يحل المعادلات الرياضية المعقدة ويقدم إحصاءات وحقائق علمية دقيقة.",
+                keywords: ["بحث", "رياضيات", "حسابات", "فيزياء", "معادلات", "كيمياء", "علمي"]
+            },
+
+            // ================== أدوات إنشاء مواقع وتطبيقات بدون كود ==================
+            {
+                id: "nocode1",
+                name: "Bubble",
+                url: "https://bubble.io",
+                category: "بدون كود",
+                pricing: "freemium",
+                desc: "المنصة الأقوى عالمياً لبناء تطبيقات ويب ومنصات برمجية معقدة بالكامل بدون كتابة كود واحد.",
+                keywords: ["بدون كود", "تطبيقات", "موقع", "برمجة مرئية", "منصة", "تطوير"]
+            },
+            {
+                id: "nocode2",
+                name: "Webflow AI",
+                url: "https://webflow.com",
+                category: "بدون كود",
+                pricing: "freemium",
+                desc: "تصميم وبناء مواقع ويب سريعة وجذابة للغاية مع تحكم كامل بالـ CSS وتكامل للأدوات الذكية.",
+                keywords: ["بدون كود", "موقع", "تصميم", "ويب فلو", "استضافة"]
+            },
+            {
+                id: "nocode3",
+                name: "Glide",
+                url: "https://www.glideapps.com",
+                category: "بدون كود",
+                pricing: "freemium",
+                desc: "أداة سريعة وسهلة جداً لتحويل جداول بيانات جوجل أو إكسل إلى تطبيقات هواتف أنيقة وتفاعلية.",
+                keywords: ["بدون كود", "تطبيق", "جوجل شيت", "اكسل", "بيانات", "هاتف"]
+            },
+            {
+                id: "nocode4",
+                name: "Softr",
+                url: "https://www.softr.io",
+                category: "بدون كود",
+                pricing: "freemium",
+                desc: "قم ببناء لوحات تحكم، بوابات عملاء، ومواقع تفاعلية بالاعتماد على قواعد بيانات Airtable أو Google Sheets.",
+                keywords: ["بدون كود", "لوحة تحكم", "قاعدة بيانات", "موقع", "بوابة عملاء"]
+            },
+            {
+                id: "nocode5",
+                name: "Durable AI",
+                url: "https://durable.co",
+                category: "بدون كود",
+                pricing: "freemium",
+                desc: "توليد موقع متكامل لشركتك أو عملك الحر في أقل من دقيقة، شامل الصور، النصوص، وخرائط التواصل.",
+                keywords: ["بدون كود", "موقع في دقيقة", "عمل حر", "سريع", "توليد موقع"]
+            },
+
+            // ================== أدوات صوت وتحويل النص إلى كلام ==================
+            {
+                id: "aud1",
+                name: "ElevenLabs",
+                url: "https://elevenlabs.io",
+                category: "صوت",
+                pricing: "freemium",
+                desc: "الأداة الرائدة عالمياً في توليد أصوات بشرية طبيعية وواقعية، واستنساخ صوتك ودبلجة المقاطع.",
+                keywords: ["صوت", "تحويل النص لصوت", "استنساخ", "تعليق صوتي", "دبلجة", "بودكاست"]
+            },
+            {
+                id: "aud2",
+                name: "Murf AI",
+                url: "https://murf.ai",
+                category: "صوت",
+                pricing: "freemium",
+                desc: "ستوديو متكامل للتعليق الصوتي لإنشاء مقاطع صوتية احترافية للعروض التقديمية والدروس والمحتوى.",
+                keywords: ["صوت", "تعليق صوتي", "تعليم", "محتوى", "نصوص لصوت"]
+            },
+            {
+                id: "aud3",
+                name: "Play.ht",
+                url: "https://play.ht",
+                category: "صوت",
+                pricing: "freemium",
+                desc: "تحويل المقالات والمستندات الطويلة إلى ملفات صوتية ذات نبرات ومشاعر طبيعية ممتازة.",
+                keywords: ["صوت", "نصوص لصوت", "مقال مسموع", "دبلجة", "بودكاست"]
+            },
+            {
+                id: "aud4",
+                name: "Speechify",
+                url: "https://speechify.com",
+                category: "صوت",
+                pricing: "freemium",
+                desc: "قارئ نصوص ذكي يقوم بقراءة أي كتاب، مستند أو موقع ويب بصوت طبيعي لمساعدتك على الاستماع والدراسة.",
+                keywords: ["صوت", "قراءة الكتب", "استماع", "تعليم", "تطبيق"]
+            },
+
+            // ================== أدوات شاملة تجمع أكثر من وظيفة ==================
+            {
+                id: "all1",
+                name: "ChatGPT (شامل)",
+                url: "https://chatgpt.com",
+                category: "شاملة",
+                pricing: "freemium",
+                desc: "منصة واحدة عملاقة تجمع بين توليد النصوص، تحليل الأكواد والبرمجة، وتصميم الصور (DALL-E)، وتحليل الملفات الكبيرة.",
+                keywords: ["شاملة", "كل شيء", "نصوص", "صور", "برمجة", "تحليل", "شات"]
+            },
+            {
+                id: "all2",
+                name: "Gemini (شامل)",
+                url: "https://gemini.google.com",
+                category: "شاملة",
+                pricing: "freemium",
+                desc: "أداة جوجل المتكاملة للبحث الذكي، كتابة النصوص باحترافية، فهم الصور، والبرمجة وتحليل المستندات البرمجية.",
+                keywords: ["شاملة", "بحث", "كتابة", "صور", "برمجة", "غوغل", "جوجل"]
+            },
+            {
+                id: "all3",
+                name: "Claude (شامل)",
+                url: "https://claude.ai",
+                category: "شاملة",
+                pricing: "freemium",
+                desc: "بطل التحليل وكتابة المستندات الطويلة، وصناعة التطبيقات المصغرة (Artifacts) والبرمجة وتتبع الثغرات.",
+                keywords: ["شاملة", "كتابة", "تحليل", "برمجة", "كود", "مستندات"]
+            },
+            {
+                id: "all4",
+                name: "Microsoft Copilot (شامل)",
+                url: "https://copilot.microsoft.com",
+                category: "شاملة",
+                pricing: "freemium",
+                desc: "مساعد رقمي شامل لحياتك المهنية والتعليمية، يدعم خدمات الأوفيس، ويبحث الويب، ويصمم صورك بالذكاء.",
+                keywords: ["شاملة", "مايكروسوفت", "عمل", "دراسة", "صور", "بحث"]
+            },
+            {
+                id: "all5",
+                name: "Perplexity AI (شامل)",
+                url: "https://www.perplexity.ai",
+                category: "شاملة",
+                pricing: "freemium",
+                desc: "اجمع بين البحث الفوري الفائق، وتحليل البيانات، وكتابة المستندات بدقة متناهية مع مصادر حية.",
+                keywords: ["شاملة", "بحث ذكي", "تحليل سريع", "دراسة", "مصادر"]
+            }
+        ];
+
+        // State variables
+        let tools = [...DEFAULT_AI_TOOLS];
+        let favorites = [];
+        let activeCategory = "الكل";
+
+        // Initialize App on DOM Content Loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load Favorites from localStorage
+            const savedFavs = localStorage.getItem('ai_hub_favorites');
+            if (savedFavs) {
+                favorites = JSON.parse(savedFavs);
+            }
+
+            // Generate Categories list
+            renderCategories();
+
+            // Render and update
+            filterAndRenderTools();
+            updateStats();
+        });
+
+        // Arabic text normalization for flawless Arabic searches (ignores common typing mistakes)
+        function normalizeArabic(text) {
+            if (!text) return "";
+            return text
+                .replace(/[أإآا]/g, 'ا')
+                .replace(/[ةه]/g, 'ه')
+                .replace(/[ىي]/g, 'ي')
+                .replace(/ئ/g, 'ي')
+                .replace(/ؤ/g, 'و')
+                .replace(/[^\u0621-\u064A\u0660-\u0669a-zA-Z0-9 ]/g, '') // strip special characters
+                .trim()
+                .toLowerCase();
+        }
+
+        // Generate Category Tabs dynamically
+        function renderCategories() {
+            const categoriesContainer = document.getElementById('categories-container');
+            const categoriesSet = new Set(tools.map(t => t.category));
+            const uniqueCategories = ["الكل", ...Array.from(categoriesSet)];
+
+            categoriesContainer.innerHTML = uniqueCategories.map(cat => {
+                const isActive = cat === activeCategory ? 'active' : '';
+                return `
+                    <button 
+                        onclick="selectCategory('${cat}')" 
+                        class="category-btn whitespace-nowrap px-4 py-2 text-xs sm:text-sm font-semibold border border-neutral-800 hover:border-white transition-all duration-200 ${isActive ? 'bg-white text-black border-white' : 'bg-neutral-950 text-neutral-400'}"
+                    >
+                        ${cat}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // Change Active Category and refresh filter
+        function selectCategory(category) {
+            activeCategory = category;
+            
+            // Highlight active button visually
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === category) {
+                    btn.classList.add('bg-white', 'text-black', 'border-white');
+                    btn.classList.remove('bg-neutral-950', 'text-neutral-400');
+                } else {
+                    btn.classList.remove('bg-white', 'text-black', 'border-white');
+                    btn.classList.add('bg-neutral-950', 'text-neutral-400');
+                }
+            });
+
+            filterAndRenderTools();
+        }
+
+        // Filter and Render Cards on the Grid
+        function filterAndRenderTools() {
+            const searchQuery = normalizeArabic(document.getElementById('search-input').value);
+            const sortVal = document.getElementById('sort-select').value;
+            const grid = document.getElementById('tools-grid');
+            const emptyState = document.getElementById('empty-state');
+            const filterFeedback = document.getElementById('filter-feedback');
+            const clearBtn = document.getElementById('clear-search');
+
+            // Show/Hide search clear button
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            // Perform core filtering logic
+            let filtered = tools.filter(tool => {
+                // 1. Filter by category tab
+                if (activeCategory !== "الكل" && tool.category !== activeCategory) {
+                    return false;
+                }
+
+                // 2. Filter by dropdown (Favorites only)
+                if (sortVal === "favorites" && !favorites.includes(tool.id)) {
+                    return false;
+                }
+
+                // 3. Filter by normalized search query
+                if (searchQuery) {
+                    const normName = normalizeArabic(tool.name);
+                    const normDesc = normalizeArabic(tool.desc);
+                    const normCat = normalizeArabic(tool.category);
+                    const keywordsMatch = tool.keywords.some(kw => normalizeArabic(kw).includes(searchQuery));
+
+                    return normName.includes(searchQuery) || 
+                           normDesc.includes(searchQuery) || 
+                           normCat.includes(searchQuery) || 
+                           keywordsMatch;
+                }
+
+                return true;
+            });
+
+            // Feedback bar
+            const isFiltering = searchQuery !== "" || activeCategory !== "الكل" || sortVal !== "all";
+            if (isFiltering) {
+                filterFeedback.classList.remove('hidden');
+                document.getElementById('filtered-count').textContent = filtered.length;
+            } else {
+                filterFeedback.classList.add('hidden');
+            }
+
+            // Check if results exist
+            if (filtered.length === 0) {
+                grid.innerHTML = "";
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                // Draw tools
+                grid.innerHTML = filtered.map(tool => {
+                    const isFav = favorites.includes(tool.id);
+                    const favIcon = isFav ? '★' : '☆';
+                    const favTitle = isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة';
+                    
+                    // Style label for pricing
+                    let pricingLabel = "مجاني جزئي";
+                    let pricingClass = "border-neutral-800 text-neutral-400";
+                    if (tool.pricing === "free") {
+                        pricingLabel = "مجاني بالكامل";
+                        pricingClass = "border-white text-white font-bold";
+                    } else if (tool.pricing === "paid") {
+                        pricingLabel = "مدفوع";
+                        pricingClass = "border-neutral-900 text-neutral-600";
+                    }
+
+                    return `
+                        <div class="bw-card flex flex-col justify-between p-6">
+                            <div>
+                                <!-- Card Header -->
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="text-[10px] uppercase tracking-widest font-mono text-neutral-500 bg-neutral-950 border border-neutral-900 px-2.5 py-1">${tool.category}</span>
+                                    <button 
+                                        onclick="toggleFavorite('${tool.id}')" 
+                                        class="text-lg hover:scale-125 transition-transform duration-100 text-white" 
+                                        title="${favTitle}"
+                                    >
+                                        ${favIcon}
+                                    </button>
+                                </div>
+
+                                <!-- Title and External Link -->
+                                <a href="${tool.url}" target="_blank" class="group flex items-center gap-1.5 text-lg font-black text-white hover:underline decoration-1 mb-2">
+                                    ${tool.name}
+                                    <svg class="w-3.5 h-3.5 text-neutral-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </a>
+
+                                <!-- Description -->
+                                <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed mb-6">
+                                    ${tool.desc}
+                                </p>
+                            </div>
+
+                            <!-- Card Footer -->
+                            <div class="flex items-center justify-between pt-4 border-t border-neutral-900 mt-auto">
+                                <span class="text-[10px] border px-2 py-0.5 ${pricingClass}">
+                                    ${pricingLabel}
+                                </span>
+                                <a 
+                                    href="${tool.url}" 
+                                    target="_blank" 
+                                    class="text-xs bg-white text-black hover:bg-neutral-200 transition-all px-3 py-1.5 font-bold"
+                                >
+                                    زيارة الموقع &larr;
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Toggle Favorite item
+        function toggleFavorite(id) {
+            const index = favorites.indexOf(id);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast("تمت الإزالة من المفضلة ⭐");
+            } else {
+                favorites.push(id);
+                showToast("تمت الإضافة للمفضلة ⭐");
+            }
+            localStorage.setItem('ai_hub_favorites', JSON.stringify(favorites));
+            filterAndRenderTools();
+            updateStats();
+        }
+
+        // Trigger Instant Search on input
+        function handleSearch() {
+            filterAndRenderTools();
+        }
+
+        // Quick click search words
+        function quickSearch(word) {
+            const searchInput = document.getElementById('search-input');
+            searchInput.value = word;
+            filterAndRenderTools();
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Clear input field
+        function clearSearchInput() {
+            document.getElementById('search-input').value = "";
+            filterAndRenderTools();
+        }
+
+        // Reset all filters and search input
+        function resetFilters() {
+            document.getElementById('search-input').value = "";
+            document.getElementById('sort-select').value = "all";
+            activeCategory = "الكل";
+            
+            // Re-highlight visually
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim() === "الكل") {
+                    btn.classList.add('bg-white', 'text-black', 'border-white');
+                    btn.classList.remove('bg-neutral-950', 'text-neutral-400');
+                } else {
+                    btn.classList.remove('bg-white', 'text-black', 'border-white');
+                    btn.classList.add('bg-neutral-950', 'text-neutral-400');
+                }
+            });
+
+            filterAndRenderTools();
+        }
+
+        // Update statistics counter
+        function updateStats() {
+            document.getElementById('tools-count').textContent = tools.length;
+            document.getElementById('favorites-count').textContent = favorites.length;
+        }
+
+        // Premium Toast Notifications
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('translate-y-24');
+            toast.classList.add('translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0');
+                toast.classList.add('translate-y-24');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
